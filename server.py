@@ -1,6 +1,7 @@
 import http.server
 import socketserver
 import os
+from urllib.parse import unquote
 
 PORT = 5000
 
@@ -12,13 +13,20 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     def guess_type(self, path):
-        mimetype = super().guess_type(path)
         path_str = str(path)
         if path_str.endswith('.js'):
-            return 'application/javascript'
+            return 'application/javascript; charset=utf-8'
         elif path_str.endswith('.css'):
-            return 'text/css'
-        return mimetype
+            return 'text/css; charset=utf-8'
+        elif path_str.endswith('.html'):
+            return 'text/html; charset=utf-8'
+        return super().guess_type(path)
+    
+    def translate_path(self, path):
+        # Remove query parameters before translating path
+        path = path.split('?', 1)[0]
+        path = unquote(path)
+        return super().translate_path(path)
 
 os.chdir('.')
 
