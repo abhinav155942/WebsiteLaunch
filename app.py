@@ -1,14 +1,18 @@
-from flask import Flask, jsonify, request, send_from_directory, send_file
+from flask import Flask, jsonify, request, send_from_directory, send_file, abort
 from flask_cors import CORS
-from sqlalchemy import create_engine, Column, String, Integer, DateTime, Boolean, Text
-from sqlalchemy.orm import sessionmaker, scoped_session, declarative_base
+from sqlalchemy import create_engine, Column, String, Integer, DateTime, Boolean, Text, ForeignKey
+from sqlalchemy.orm import sessionmaker, scoped_session, declarative_base, relationship
 from datetime import datetime, timedelta
+from werkzeug.security import safe_join
 import os
 import secrets
 import bcrypt
 
 app = Flask(__name__, static_folder='.')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 CORS(app)
+
+STATIC_ROOT = os.path.abspath('.')
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 if not DATABASE_URL:
@@ -39,12 +43,14 @@ class Session(Base):
     
     id = Column(String, primary_key=True)
     token = Column(String, unique=True, nullable=False)
-    user_id = Column(String, nullable=False)
+    user_id = Column(String, ForeignKey('users.id'), nullable=False)
     ip_address = Column(String)
     user_agent = Column(Text)
     expires_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    user = relationship("User", backref="sessions")
 
 Base.metadata.create_all(engine)
 
@@ -272,18 +278,24 @@ def get_subscription():
 
 @app.route('/')
 def serve_index():
-    return send_file('index.html')
+    return send_from_directory(STATIC_ROOT, 'index.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
-    if os.path.exists(path):
-        if os.path.isfile(path):
-            return send_file(path)
-        else:
-            index_path = os.path.join(path, 'index.html')
-            if os.path.exists(index_path):
-                return send_file(index_path)
-    return send_file('index.html')
+    safe_path = safe_join(STATIC_ROOT, path)
+    
+    if safe_path is None:
+        abort(404)
+    
+    if os.path.isfile(safe_path):
+        return send_file(safe_path)
+    
+    if os.path.isdir(safe_path):
+        index_path = safe_join(safe_path, 'index.html')
+        if index_path and os.path.isfile(index_path):
+            return send_file(index_path)
+    
+    return send_from_directory(STATIC_ROOT, 'index.html')
 
 @app.after_request
 def add_header(response):

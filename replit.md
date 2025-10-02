@@ -75,11 +75,12 @@ Preferred communication style: Simple, everyday language.
 - Query parameter handling for Next.js deployment parameters
 - Public URL: Available via REPLIT_DEV_DOMAIN environment variable
 
-**Browser Compatibility Note**
-- Website uses modern JavaScript (ES2020+) with features like optional chaining and nullish coalescing
-- Replit preview browser has limited support for modern syntax
-- For full functionality, access the website via external modern browser (Chrome, Firefox, Safari)
-- All files serve correctly with HTTP 200 status; any rendering issues are browser-specific
+**⚠️ IMPORTANT: Browser Compatibility**
+- This website uses modern JavaScript (ES2020+) with features like optional chaining (`?.`) and nullish coalescing (`??`)
+- **The Replit preview browser CANNOT run modern JavaScript** - you will see "Something went wrong!" errors
+- **SOLUTION: Click "Open in new tab" button** to view in Chrome, Firefox, or Safari
+- The backend and all API endpoints work perfectly - the issue is only with the preview browser
+- All files serve correctly with HTTP 200 status; rendering issues are browser-specific, not server issues
 
 ## Replit Environment Setup
 
