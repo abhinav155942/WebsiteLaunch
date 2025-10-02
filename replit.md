@@ -80,3 +80,44 @@ Preferred communication style: Simple, everyday language.
 - Replit preview browser has limited support for modern syntax
 - For full functionality, access the website via external modern browser (Chrome, Firefox, Safari)
 - All files serve correctly with HTTP 200 status; any rendering issues are browser-specific
+
+## Replit Environment Setup
+
+### Configuration
+- **Language**: Python 3.11.13 (built-in)
+- **Workflow**: "Server" workflow configured to run `python3 server.py`
+- **Port**: 5000 (frontend server bound to 0.0.0.0:5000)
+- **Deployment**: Configured for autoscale deployment target
+
+### Project Structure
+```
+.
+├── server.py              # Python HTTP server (serves static files)
+├── index.html             # Main HTML entry point
+├── _next/                 # Next.js static export files
+│   └── static/
+│       ├── chunks/        # JavaScript bundles
+│       └── css/           # Stylesheets
+├── api/                   # Static API response files
+├── fonts.googleapis.com/  # Font assets
+├── fonts.gstatic.com/     # Font files
+└── slelguoygbfzlpylpxfs.supabase.co/  # External script references
+```
+
+### Running the Project
+1. The server automatically starts via the configured workflow
+2. Access the website through the Replit preview pane
+3. For best results, use the "Open in new tab" option to view in an external browser
+4. All static files are served with proper MIME types and cache-control headers
+
+### Deployment
+- Deployment configured using `autoscale` target
+- Run command: `python3 server.py`
+- No build step required (static export already built)
+- Ready to publish using Replit's deployment system
+
+### Notes
+- No package dependencies required (uses Python standard library)
+- Static export from original Next.js application
+- All external API calls reference original Supabase backend
+- Git ignore configured for Python artifacts and logs
